@@ -1,0 +1,23 @@
+.App {
+  text-align: center;
+}
+
+.MuiTableContainer-root {
+    margin: 20px 0;
+}
+
+.MuiTable-root {
+    table-layout: fixed;
+}
+
+form {
+    padding: 100px 0 50px 0;
+}
+
+.MuiPaper-root {
+    margin: 20px 0 0 0;
+}
+
+td {
+    word-wrap:break-word;
+}

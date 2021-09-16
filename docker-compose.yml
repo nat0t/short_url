@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8.0.17
+    command: --default-authentication-plugin=mysql_native_password
+    privileged: true
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: dbrootpassword
+      MYSQL_USER: dbadmin
+      MYSQL_PASSWORD: dbpassword
+      MYSQL_DATABASE: shortener
+
+  redis:
+    image: redis:6.2.5
+    privileged: true
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    command: bash -c "
+      ./wait-for-mysql.sh db
+      && ./maintain_db.sh db
+      && python manage.py migrate
+      && gunicorn backend.wsgi -b 0.0.0.0:8080
+      "
+    depends_on:
+      - db
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - "8000:8000"
+    depends_on:
+      - backend
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - nginx
